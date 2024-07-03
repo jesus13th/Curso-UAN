@@ -1,5 +1,6 @@
-using System.Collections;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : Character
 {
@@ -23,11 +24,18 @@ public class PlayerController : Character
     private int extraJump = 1;
     [SerializeField] private bool isRunning;
     [SerializeField] private int health = 100;
+    [SerializeField] private Slider healthSlider;
+    [SerializeField] private TMP_Text healthText;
     [SerializeField] private bool isDead = false;
+
+    [SerializeField] private AudioClip jumpClip;
 
     private void Awake()
     {
         _camera = Camera.main.GetComponent<CameraManager>();
+        healthSlider.maxValue = health;
+        healthSlider.value = health;
+        healthText.text = $"Vida: {health}";
     }
 
     void Update()
@@ -56,6 +64,7 @@ public class PlayerController : Character
         {
             extraJump--;
             _rigidbody.AddForce(Vector3.up * jumpForce * _rigidbody.mass);
+            AudioManager.Instance.PlaySound(jumpClip);
         }
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation , Time.deltaTime * rotationSmooth);
     }
@@ -80,7 +89,10 @@ public class PlayerController : Character
             return;
         }
         health -= damage;
-        Debug.Log("ApplyDamage");
+
+        healthSlider.value = health;
+        healthText.text = $"Vida: {health}";
+
         if (health <= 0)
         {
             isDead = true;
